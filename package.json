@@ -1,11 +1,14 @@
 {
   "name": "bookstore",
   "version": "1.0.0",
-  "description": "api used to sell books",
+  "description": "API used to sell books",
   "main": "server.js",
+  "type": "module",
   "scripts": {
+    "sbom:syft": "docker run --rm -v \"$(pwd)\":/project anchore/syft:latest dir:/project -o cyclonedx-json > sbom.cdx.json",
     "prepare": "husky install",
-    "dev": "node --inspect=0.0.0.0 --require ./src/infrastructure/suppress-experimental-fetch-warnings.js --watch --trace-warnings --experimental-loader ts-node/esm ./init.ts",
+    "dev": "node --inspect=0.0.0.0 --require ./src/infrastructure/suppress-experimental-fetch-warnings.cjs --watch --trace-warnings --experimental-loader ts-node/esm ./init.ts",
+    "start": "node --require ./src/infrastructure/suppress-experimental-fetch-warnings.cjs --trace-warnings --experimental-loader ts-node/esm ./init.ts",
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "jest",
     "test:e2e": "DATABASE_URL=$DATABASE_URL_TEST jest -c src/e2e/jest.e2e.config.ts --runInBand",

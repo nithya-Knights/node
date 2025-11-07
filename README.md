@@ -74,3 +74,4 @@ docker compose exec node sh -c 'npm run test -- --watchAll'
 1. editorconfig
 2. eslint
 3. prisma
+# test trigger

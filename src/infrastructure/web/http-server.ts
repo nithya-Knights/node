@@ -1,7 +1,7 @@
 import express from 'express';
 import expressOasGenerator, { SPEC_OUTPUT_FILE_BEHAVIOR } from 'express-oas-generator';
 import { IHttpRoute } from '../../interfaces/http/routes.interface';
-import environment from '../config/environment';
+import environment from '../config/environment.ts';
 
 export const createHttpServer = (routes: IHttpRoute[]) => {
   const app = express();
