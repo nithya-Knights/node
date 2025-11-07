@@ -1,0 +1,9 @@
+version: 1
+project:
+  name: nodejs-bookstore-api
+analyzer:
+  include:
+    - "**/*"
+exclude:
+  - "node_modules"
+  - "dist"
