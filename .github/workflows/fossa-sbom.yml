@@ -20,11 +20,12 @@ jobs:
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
           fossa --version
 
-      # 🔹 Group is now read automatically from .fossa.yml
-      - name: Analyze project with FOSSA
+      # 🔹 Analyze and attach this scan to the fin-group release group
+      - name: Analyze project with FOSSA (fin-group)
         env:
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
-        run: fossa analyze
+        run: |
+          fossa analyze --release-group-name fin-group --release-group-release latest
 
       - name: Generate SBOMs
         env:
