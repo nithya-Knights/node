@@ -13,7 +13,7 @@ jobs:
 
     steps:
       # 1️⃣ Checkout your code
-      - name: Checkout repository
+      - name: Checkout into repository
         uses: actions/checkout@v4
 
       # 2️⃣ Install FOSSA CLI (same as your curl command)
