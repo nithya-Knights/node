@@ -58,7 +58,7 @@ jobs:
       # 6️⃣ Run FOSSA CLI Scan
       # -----------------------------------------------------------
       - name: 🔍 Run FOSSA dependency & license analysis
-        uses: fossas/fossa-action@v2
+        uses: fossas/fossa-action@v1
         with:
           api_key: ${{ secrets.FOSSA_API_KEY }}
 
