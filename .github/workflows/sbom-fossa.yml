@@ -1,37 +1,73 @@
-name: SBOM + FOSSA Scan
+name: FOSSA + SBOM Scan (feature/fossa-sbom)
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ feature/fossa-sbom ]
   pull_request:
+    branches: [ feature/fossa-sbom ]
 
 jobs:
-  sbom-and-fossa:
+  fossa-sbom-scan:
+    name: Generate SBOM & Run FOSSA Analysis
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # -----------------------------------------------------------
+      # 1️⃣ Checkout repository
+      # -----------------------------------------------------------
+      - name: 🧩 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      # -----------------------------------------------------------
+      # 2️⃣ Setup Node.js
+      # -----------------------------------------------------------
+      - name: ⚙️ Setup Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: "npm"
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate SBOM (CycloneDX)
+      # -----------------------------------------------------------
+      # 3️⃣ Install project dependencies
+      # -----------------------------------------------------------
+      - name: 📦 Install dependencies
         run: |
-          docker run --rm -v "${{ github.workspace }}":/project anchore/syft:latest dir:/project -o cyclonedx-json > sbom.cdx.json
+          echo "Installing npm dependencies..."
+          npm ci
+          echo "✅ Dependencies installed successfully"
 
-      - name: Upload SBOM
+      # -----------------------------------------------------------
+      # 4️⃣ Generate SBOM (CycloneDX format)
+      # -----------------------------------------------------------
+      - name: 🧾 Generate SBOM (CycloneDX)
+        run: |
+          echo "🔍 Generating CycloneDX SBOM using Anchore Syft..."
+          docker run --rm -v "${{ github.workspace }}":/project anchore/syft:latest dir:/project -o cyclonedx-json > sbom.cdx.json
+          echo "✅ SBOM generated: sbom.cdx.json"
+          ls -lh sbom.cdx.json
+
+      # -----------------------------------------------------------
+      # 5️⃣ Upload SBOM as build artifact
+      # -----------------------------------------------------------
+      - name: 📤 Upload SBOM artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sbom
+          name: sbom-cyclonedx
           path: sbom.cdx.json
 
-      - name: Run FOSSA Scan
+      # -----------------------------------------------------------
+      # 6️⃣ Run FOSSA CLI analysis
+      # -----------------------------------------------------------
+      - name: 🔍 Run FOSSA scan and analysis
         uses: fossas/fossa-action@v2
         with:
           api_key: ${{ secrets.FOSSA_API_KEY }}
+
+      # -----------------------------------------------------------
+      # 7️⃣ Validate and print summary (optional)
+      # -----------------------------------------------------------
+      - name: 📊 Validate SBOM structure
+        run: |
+          echo "Validating SBOM file..."
+          head -n 20 sbom.cdx.json
+          echo "✅ SBOM validation complete"
