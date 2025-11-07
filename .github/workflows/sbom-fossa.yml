@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      # -----------------------------------------------------------
       # 1️⃣ Checkout repository
       # -----------------------------------------------------------
       - name: 🧩 Checkout source code
@@ -63,7 +63,23 @@ jobs:
           api-key: ${{ secrets.FOSSA_API_KEY }}
 
       # -----------------------------------------------------------
-      # 7️⃣ Display SBOM summary (optional)
+      # 7️⃣ Upload SBOM to FOSSA SBOM Import API
+      # -----------------------------------------------------------
+      - name: ☁️ Upload SBOM to FOSSA dashboard
+        env:
+          FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
+        run: |
+          echo "☁️ Uploading CycloneDX SBOM to FOSSA API..."
+          curl -s -o response.json -w "%{http_code}" \
+            -X POST "https://app.fossa.com/api/projects/custom/upload" \
+            -H "Authorization: token ${FOSSA_API_KEY}" \
+            -F "name=nodejs-bookstore-api" \
+            -F "format=cyclonedx" \
+            -F "file=@sbom.cdx.json"
+          echo "✅ SBOM upload complete — check your FOSSA dashboard under 'Imported SBOMs'"
+
+      # -----------------------------------------------------------
+      # 8️⃣ Display SBOM summary (optional)
       # -----------------------------------------------------------
       - name: 📊 Display SBOM summary
         run: |
