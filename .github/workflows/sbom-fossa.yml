@@ -1,0 +1,37 @@
+name: SBOM + FOSSA Scan
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  sbom-and-fossa:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate SBOM (CycloneDX)
+        run: |
+          docker run --rm -v "${{ github.workspace }}":/project anchore/syft:latest dir:/project -o cyclonedx-json > sbom.cdx.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.cdx.json
+
+      - name: Run FOSSA Scan
+        uses: fossas/fossa-action@v2
+        with:
+          api_key: ${{ secrets.FOSSA_API_KEY }}
