@@ -1,4 +1,6 @@
 # BOOKSTORE NODE.JS API
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmrpraveenpr%2Fnodejs-bookstore-api.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmrpraveenpr%2Fnodejs-bookstore-api?ref=badge_shield)
+
 A bookstore API created using node.js, typescript/javascript, mongodb, prisma orm, and jest.
 
 Trying to follow the depency rule and layers described in clean architecture, but avoiding to use or create a dependency injection mechanism.
@@ -74,3 +76,7 @@ docker compose exec node sh -c 'npm run test -- --watchAll'
 1. editorconfig
 2. eslint
 3. prisma
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmrpraveenpr%2Fnodejs-bookstore-api.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmrpraveenpr%2Fnodejs-bookstore-api?ref=badge_large)
