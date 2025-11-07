@@ -60,7 +60,7 @@ jobs:
       - name: 🔍 Run FOSSA dependency & license analysis
         uses: fossas/fossa-action@v1
         with:
-          api_key: ${{ secrets.FOSSA_API_KEY }}
+          api-key: ${{ secrets.FOSSA_API_KEY }}
 
       # -----------------------------------------------------------
       # 7️⃣ Display SBOM summary (optional)
