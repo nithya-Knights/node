@@ -12,22 +12,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout your code
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Install FOSSA CLI (same as your curl command)
       - name: Install FOSSA CLI
         run: |
           curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install-latest.sh | bash
           fossa --version
 
-      # 🔹 Analyze and attach this scan to the fin-group release group
-      - name: Analyze project with FOSSA (fin-group)
+      # 3️⃣ Run FOSSA analyze (exactly what you did manually)
+      - name: Analyze project with FOSSA
         env:
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
         run: |
-          fossa analyze --release-group-name fin-group --release-group-release latest
+          fossa analyze
 
-      - name: Generate SBOMs
+      # 4️⃣ Generate SBOM file (CycloneDX JSON format)
+      - name: Generate SBOM
         env:
           FOSSA_API_KEY: ${{ secrets.FOSSA_API_KEY }}
         run: |
@@ -35,6 +38,7 @@ jobs:
           fossa report attribution --format cyclonedx-json > sbom/sbom-cyclonedx.json
           fossa report attribution --format spdx-json > sbom/sbom-spdx.json
 
+      # 5️⃣ Upload SBOM artifacts
       - name: Upload SBOM Artifacts
         uses: actions/upload-artifact@v4
         with:
