@@ -1,0 +1,54 @@
+name: Dependency Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm install
+
+      # Step 1: Run npm audit and generate a JSON report
+      - name: Run npm audit
+        run: |
+          echo "🔍 Running npm audit..."
+          npm audit --audit-level=high --json > audit-report.json
+          echo "✅ npm audit completed. Report saved to audit-report.json."
+
+      # Step 2: Check for legacy libraries (e.g., moment.js)
+      - name: Check for legacy libraries (moment.js)
+        run: |
+          echo "🔎 Checking for legacy libraries..."
+          if grep -R '"moment"' package.json package-lock.json > /dev/null; then
+            echo "❌ Legacy library detected: moment.js"
+            echo "Failing build per OTS-RSK-00031 policy."
+            exit 1
+          else
+            echo "✅ No legacy libraries detected."
+          fi
+
+      # Step 3: Upload npm audit JSON as an artifact for compliance tracking
+      - name: Upload audit report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: audit-report.json
+
+      # Step 4: Generate a human-readable summary in the GitHub Actions UI
+      - name: Generate summary report
+        if: always()
+        run: |
+          echo "## 🧾 Dependency Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **npm audit level:** HIGH" >> $GITHUB_STEP_SUMMARY
+          echo "- **Legacy policy:** Enforced (moment.js blocked)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Audit report:** Attached as artifact (audit-report.json)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run completed at:** $(date)" >> $GITHUB_STEP_SUMMARY
