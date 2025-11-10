@@ -1,0 +1,78 @@
+name: Security & Compliance Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛠️ Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # -------------------------------------------------------
+      # OTS-RSK-00031 - Legacy Libraries (moment.js detection)
+      # -------------------------------------------------------
+      - name: 🔍 Legacy libraries (moment.js detection)
+        run: |
+          echo "🔍 Checking for legacy library: moment.js..."
+          if grep -R "moment" package*.json; then
+            echo "❌ OTS-RSK-00031 FAILED: 'moment.js' detected. Replace with modern alternative (e.g., dayjs, date-fns)."
+            exit 1
+          else
+            echo "✅ OTS-RSK-00031 PASSED: No legacy libraries detected."
+          fi
+
+      - name: 🔎 npm audit check
+        run: |
+          echo "🔍 Running npm audit..."
+          npm audit --audit-level=moderate || (echo "❌ npm audit found vulnerabilities"; exit 1)
+
+      # -------------------------------------------------------
+      # OTS-RSK-00022 - PHI in Storage (ESLint rule)
+      # -------------------------------------------------------
+      - name: 🔍 Running ESLint PHI in Storage policy check (OTS-RSK-00022)
+        run: |
+          echo "🔍 Checking for useStorage() usage..."
+          npx eslint . --ext .js,.ts,.vue --no-eslintrc --rule '{"no-restricted-syntax":["error",{ "selector": "CallExpression[callee.name=\'useStorage\']", "message": "Detected useStorage() - possible PHI in storage (OTS-RSK-00022)" }]}' || (echo "❌ PHI storage rule failed"; exit 1)
+
+      # -------------------------------------------------------
+      # OTS-RSK-00034 - Secrets in Code
+      # -------------------------------------------------------
+      - name: 🕵️ Secrets scanning with TruffleHog
+        uses: trufflesecurity/trufflehog@v3
+        with:
+          scan: .
+          fail: true
+
+      # -------------------------------------------------------
+      # OTS-RSK-00043 - Vulnerable Dependencies
+      # -------------------------------------------------------
+      - name: 🧠 Snyk vulnerability scan
+        uses: snyk/actions/node@v1
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=medium
+
+      # Optional: Dependency-Check (OWASP)
+      - name: 🧩 Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "node"
+          path: .
+          format: "HTML"
+          out: "./dependency-check-report"
