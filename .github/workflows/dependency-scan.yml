@@ -15,20 +15,26 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check for legacy libraries
+        id: legacycheck
         run: |
           echo "🔎 Checking for legacy libraries (moment, lodash, underscore, jquery)..."
           if grep -E '"(moment|lodash|underscore|jquery)"' package.json package-lock.json > /dev/null; then
             echo "❌ Legacy library detected (moment/lodash/underscore/jquery)"
+            echo "detected=true" >> $GITHUB_OUTPUT
             exit 1
           else
             echo "✅ No legacy libraries detected."
+            echo "detected=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Generate summary report
         if: always()
         run: |
-          echo "## Legacy Library Check" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧾 Legacy Library Check" >> $GITHUB_STEP_SUMMARY
           echo "- Policy: Fail build if moment, lodash, underscore, or jquery detected" >> $GITHUB_STEP_SUMMARY
-          echo "- Result: ✅ No legacy libraries found" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.legacycheck.outputs.detected }}" = "true" ]; then
+            echo "- Result: ❌ Legacy libraries detected (moment/lodash/underscore/jquery)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Result: ✅ No legacy libraries found" >> $GITHUB_STEP_SUMMARY
+          fi
           echo "- Completed at: $(date)" >> $GITHUB_STEP_SUMMARY
-
