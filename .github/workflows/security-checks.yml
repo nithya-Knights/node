@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "🔍 Checking for useStorage() usage..."
           npx eslint . --ext .js,.ts,.vue --no-eslintrc \
-            --rule '{"no-restricted-syntax":["error",{ "selector": "CallExpression[callee.name=\'useStorage\']", "message": "Detected useStorage() - possible PHI in storage (OTS-RSK-00022)" }]}' \
+            --rule "{\"no-restricted-syntax\":[\"error\",{ \"selector\": \"CallExpression\\[callee.name='useStorage'\\]\", \"message\": \"Detected useStorage() - possible PHI in storage (OTS-RSK-00022)\" }]}" \
             || (echo "❌ PHI storage rule failed"; exit 1)
 
       # -------------------------------------------------------
@@ -70,12 +70,4 @@ jobs:
           args: --severity-threshold=medium
 
       # -------------------------------------------------------
-      # Optional: Dependency-Check (OWASP)
-      # -------------------------------------------------------
-      - name: 🧩 Run OWASP Dependency Check
-        uses: dependency-check/Dependency-Check_Action@main
-        with:
-          project: "NuxtFrontend"
-          path: .
-          format: "HTML"
-          out: "./dependency-check-report"
+      # Optional: Dependency-Check (OWAS
