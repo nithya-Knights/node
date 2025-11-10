@@ -10,6 +10,7 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
+
     steps:
       - name: 🛠️ Checkout repository
         uses: actions/checkout@v4
@@ -46,13 +47,15 @@ jobs:
       - name: 🔍 Running ESLint PHI in Storage policy check (OTS-RSK-00022)
         run: |
           echo "🔍 Checking for useStorage() usage..."
-          npx eslint . --ext .js,.ts,.vue --no-eslintrc --rule '{"no-restricted-syntax":["error",{ "selector": "CallExpression[callee.name=\'useStorage\']", "message": "Detected useStorage() - possible PHI in storage (OTS-RSK-00022)" }]}' || (echo "❌ PHI storage rule failed"; exit 1)
+          npx eslint . --ext .js,.ts,.vue --no-eslintrc \
+            --rule '{"no-restricted-syntax":["error",{ "selector": "CallExpression[callee.name=\'useStorage\']", "message": "Detected useStorage() - possible PHI in storage (OTS-RSK-00022)" }]}' \
+            || (echo "❌ PHI storage rule failed"; exit 1)
 
       # -------------------------------------------------------
       # OTS-RSK-00034 - Secrets in Code
       # -------------------------------------------------------
       - name: 🕵️ Secrets scanning with TruffleHog
-        uses: trufflesecurity/trufflehog@v3
+        uses: trufflesecurity/trufflehog@v3.68.6
         with:
           scan: .
           fail: true
