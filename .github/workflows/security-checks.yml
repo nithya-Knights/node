@@ -35,7 +35,15 @@ jobs:
             echo "✅ OTS-RSK-00031 PASSED: No legacy libraries detected."
           fi
 
-      - name: 🔎 npm audit check
+      # -------------------------------------------------------
+      # 🔧 Auto-fix + npm audit check (OTS-RSK-00043)
+      # -------------------------------------------------------
+      - name: 🔧 Attempt to auto-fix npm vulnerabilities
+        run: |
+          echo "🩹 Running npm audit fix..."
+          npm audit fix || echo "⚠️ Auto-fix did not resolve all vulnerabilities."
+
+      - name: 🔎 npm audit check (fail if still vulnerable)
         run: |
           echo "🔍 Running npm audit..."
           npm audit --audit-level=moderate || (echo "❌ npm audit found vulnerabilities"; exit 1)
@@ -51,7 +59,7 @@ jobs:
             || (echo "❌ PHI storage rule failed"; exit 1)
 
       # -------------------------------------------------------
-      # OTS-RSK-00043 - Vulnerable Dependencies
+      # OTS-RSK-00043 - Vulnerable Dependencies (Snyk)
       # -------------------------------------------------------
       - name: 🧠 Snyk vulnerability scan
         uses: snyk/actions/node@v1
