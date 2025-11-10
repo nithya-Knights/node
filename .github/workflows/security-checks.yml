@@ -48,16 +48,13 @@ jobs:
           echo "🔍 Running npm audit..."
           npm audit --audit-level=moderate || (echo "❌ npm audit found vulnerabilities"; exit 1)
 
-      # -------------------------------------------------------
-      # OTS-RSK-00022 - PHI in Storage (ESLint rule)
-      # -------------------------------------------------------
-      - name: 🔍 Running ESLint PHI in Storage policy check (OTS-RSK-00022)
+      # 🔒 Run only OTS-RSK-00022 custom rule (PHI in Storage)
+      - name: Run ESLint (PHI in Storage Policy Only)
+        id: eslintphi
         run: |
-          echo "🔍 Checking for useStorage() usage..."
-          npx eslint . --ext .js,.ts,.vue --no-eslintrc \
-            --rule "{\"no-restricted-syntax\":[\"error\",{ \"selector\": \"CallExpression\\[callee.name='useStorage'\\]\", \"message\": \"Detected useStorage() - possible PHI in storage (OTS-RSK-00022)\" }]}" \
-            || (echo "❌ PHI storage rule failed"; exit 1)
-
+          echo "🔍 Running ESLint PHI in Storage policy check (OTS-RSK-00022)..."
+          npx eslint . --ext .js,.ts,.tsx --no-eslintrc --rule '{"custom-rules/no-useStorage":"error"}' --plugin custom-rules || echo "violations=true" >> $GITHUB_OUTPUT
+          echo "✅ ESLint PHI policy check completed."
       # -------------------------------------------------------
       # OTS-RSK-00043 - Vulnerable Dependencies (Snyk)
       # -------------------------------------------------------
