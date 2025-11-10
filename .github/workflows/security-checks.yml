@@ -55,7 +55,7 @@ jobs:
       # OTS-RSK-00034 - Secrets in Code
       # -------------------------------------------------------
       - name: 🕵️ Secrets scanning with TruffleHog
-        uses: trufflesecurity/trufflehog@v3.68.6
+        uses: trufflesecurity/trufflehog@main
         with:
           scan: .
           fail: true
@@ -71,7 +71,9 @@ jobs:
           command: test
           args: --severity-threshold=medium
 
-      # Optional: Dependency-Check (OWASP)
+      # -------------------------------------------------------
+      # Optional: OWASP Dependency-Check (HTML report)
+      # -------------------------------------------------------
       - name: 🧩 Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
