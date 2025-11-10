@@ -1,4 +1,4 @@
-name: Legacy Library Check (moment.js)
+name: Legacy Library Check (moment.js, lodash, underscore, jquery)
 
 on:
   push:
@@ -14,20 +14,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Check for legacy library (moment.js)
+      - name: Check for legacy libraries
         run: |
-          echo "🔎 Checking for legacy library: moment.js ..."
-          if grep -R '"moment"' package.json package-lock.json > /dev/null; then
-            echo "❌ moment.js detected — failing build per OTS-RSK-00031 policy."
+          echo "🔎 Checking for legacy libraries (moment, lodash, underscore, jquery)..."
+          if grep -E '"(moment|lodash|underscore|jquery)"' package.json package-lock.json > /dev/null; then
+            echo "❌ Legacy library detected (moment/lodash/underscore/jquery)"
             exit 1
           else
-            echo "✅ No moment.js dependency detected."
+            echo "✅ No legacy libraries detected."
           fi
 
       - name: Generate summary report
         if: always()
         run: |
-          echo "## 🧾 OTS-RSK-00031 – Legacy Library Check" >> $GITHUB_STEP_SUMMARY
-          echo "- Policy: Fail build if moment.js detected" >> $GITHUB_STEP_SUMMARY
-          echo "- Result: ✅ No moment.js found" >> $GITHUB_STEP_SUMMARY
+          echo "## Legacy Library Check" >> $GITHUB_STEP_SUMMARY
+          echo "- Policy: Fail build if moment, lodash, underscore, or jquery detected" >> $GITHUB_STEP_SUMMARY
+          echo "- Result: ✅ No legacy libraries found" >> $GITHUB_STEP_SUMMARY
           echo "- Completed at: $(date)" >> $GITHUB_STEP_SUMMARY
+
