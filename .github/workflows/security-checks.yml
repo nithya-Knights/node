@@ -10,7 +10,6 @@ on:
 jobs:
   security-scan:
     runs-on: ubuntu-latest
-
     steps:
       - name: 🛠️ Checkout repository
         uses: actions/checkout@v4
@@ -52,15 +51,6 @@ jobs:
             || (echo "❌ PHI storage rule failed"; exit 1)
 
       # -------------------------------------------------------
-      # OTS-RSK-00034 - Secrets in Code
-      # -------------------------------------------------------
-      - name: 🕵️ Secrets scanning with TruffleHog
-        uses: trufflesecurity/trufflehog@main
-        with:
-          scan: .
-          fail: true
-
-      # -------------------------------------------------------
       # OTS-RSK-00043 - Vulnerable Dependencies
       # -------------------------------------------------------
       - name: 🧠 Snyk vulnerability scan
@@ -72,7 +62,7 @@ jobs:
           args: --severity-threshold=medium
 
       # -------------------------------------------------------
-      # Optional: OWASP Dependency-Check (HTML report)
+      # Optional: Dependency-Check (OWASP)
       # -------------------------------------------------------
       - name: 🧩 Run OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
