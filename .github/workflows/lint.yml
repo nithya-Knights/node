@@ -1,0 +1,25 @@
+name: ESLint Security Policy Check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  eslint-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint (check PHI policy)
+        run: |
+          echo "🔍 Running ESLint PHI in Storage policy check (OTS-RSK-00022)..."
+          npx eslint . --ext .js,.ts,.tsx
